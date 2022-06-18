@@ -1,6 +1,9 @@
 import "./Create.css";
 import { useState } from "react";
 import { useRef } from "react";
+import { useFetch } from "../../hooks/useFetch";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Create = () => {
   const [title, setTitle] = useState("");
@@ -9,20 +12,20 @@ const Create = () => {
   const [newIngredient, setNewIngredient] = useState("");
   const [ingredients, setIngredients] = useState([]);
   const ingredientInput = useRef(null);
+  const { postData, data, err } = useFetch("http://localhost:3000/recipes", "POST");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(
-      "title:",
-      title,
-      ", method:",
-      method,
-      ", cookingTime:",
-      cookingTime,
-      "ingredients:",
-      ingredients
-    );
+    console.log("title:", title, ", method:", method, ", cookingTime:", cookingTime, "ingredients:", ingredients);
+    postData({ title, method, cookingTime: cookingTime + " minutes", ingredients });
   };
+
+  useEffect(() => {
+    if (data) {
+      navigate("/");
+    }
+  }, [data]);
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -68,11 +71,7 @@ const Create = () => {
           <textarea onChange={(e) => setMethod(e.target.value)} value={method} />
 
           <span>Cokking time (minutes):</span>
-          <input
-            type="number"
-            onChange={(e) => setCookingTime(e.target.value)}
-            value={cookingTime}
-          />
+          <input type="number" onChange={(e) => setCookingTime(e.target.value)} value={cookingTime} />
         </label>
 
         <button className="btn">submit</button>
